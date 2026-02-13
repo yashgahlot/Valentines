@@ -1161,8 +1161,8 @@
 
     <div class="form-group">
       <div class="check-row">
-        <input type="checkbox" id="terms" name="terms" required>
-        <label for="terms">
+        <input type="checkbox" id="termsAgree" name="terms" required>
+        <label for="termsAgree">
           I agree to the <a href="#terms">Terms &amp;&amp; Conditions</a>. I understand my email will only ever be shared with my match — no spam, no lists, no selling.
         </label>
       </div>
@@ -1401,6 +1401,19 @@ function setupSelectPlaceholders() {
 
 setupSelectPlaceholders();
 
+// Smooth scroll for in-page anchor links (e.g., Terms)
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', (e) => {
+    const id = link.getAttribute('href');
+    if (!id || id === '#') return;
+    const target = document.querySelector(id);
+    if (!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    history.pushState(null, '', id);
+  });
+});
+
 // ── Scarcity + countdown ──
 const spotCounter = document.getElementById('spotCounter');
 const countdownEl = document.getElementById('countdown');
@@ -1584,7 +1597,9 @@ function showSuccessUI(formEl) {
 
   setTimeout(() => {
     formEl.style.display = 'none';
-    document.getElementById('successState').classList.add('on');
+    const successEl = document.getElementById('successState');
+    successEl.classList.add('on');
+    successEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     // burst of hearts
     for (let i = 0; i < 12; i++) {
       const h = spawnHeart();
@@ -1630,7 +1645,7 @@ form.addEventListener('submit', function(e) {
   const email = getInputValue('email');
   const instagram = getInputValue('insta');
   const ageValue = getInputValue('age');
-  const terms = document.getElementById('terms').checked;
+  const terms = document.getElementById('termsAgree').checked;
   const data = collectValues();
   const vibeGroup = document.getElementById('vibeGroup');
   const intentValue = getCheckedValue('input[name="intent"]:checked');
@@ -1667,8 +1682,8 @@ form.addEventListener('submit', function(e) {
   }
 
   if (!terms) {
-    document.getElementById('terms').closest('.form-group').style.opacity = '0.6';
-    setTimeout(() => document.getElementById('terms').closest('.form-group').style.opacity = '1', 600);
+    document.getElementById('termsAgree').closest('.form-group').style.opacity = '0.6';
+    setTimeout(() => document.getElementById('termsAgree').closest('.form-group').style.opacity = '1', 600);
     return;
   }
 
