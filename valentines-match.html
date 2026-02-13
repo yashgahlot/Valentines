@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sweetheart Strangers • Valentine's Matchmaker</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<!-- Blocking script: sets theme before first paint to prevent flash -->
+<script>
+  (function(){
+    var saved = localStorage.getItem('ss-theme');
+    var osLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+    if (saved === 'light' || (!saved && osLight)) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+</script>
+<style>
+  :root {
+    --bg:        #0f0608;
+    --bg2:       #180a0d;
+    --surface:   rgba(255,255,255,0.03);
+    --border:    rgba(255,220,210,0.12);
+    --crimson:   #c0364a;
+    --rose:      #e8607a;
+    --blush:     #f5c0c8;
+    --gold:      #d4a55a;
+    --pale-gold: #eddaaa;
+    --cream:     #f9ede8;
+    --ink:       #f9ede8;
+    --muted:     rgba(249,237,232,0.45);
+    --faint:     rgba(249,237,232,0.22);
+  }
+
+  /* ── Light mode overrides ── */
+  body.light,
+  html[data-theme="light"] body {
+    --bg:        #fdf0f2;
+    --bg2:       #fae4e8;
+    --surface:   rgba(192,54,74,0.04);
+    --border:    rgba(160,40,60,0.18);
+    --crimson:   #b02840;
+    --rose:      #d44060;
+    --blush:     #c0364a;
+    --gold:      #a0722a;
+    --pale-gold: #7a5218;
+    --cream:     #2a0e14;
+    --ink:       #2a0e14;
+    --muted:     rgba(42,14,20,0.55);
+    --faint:     rgba(42,14,20,0.32);
+  }
+
+  body.light,
+  html[data-theme="light"] body { background: #fdf0f2; }
+
+  /* Smooth theme transition on every element */
+  body, body * {
+    transition-property: background-color, color, border-color, box-shadow;
+    transition-duration: 0.4s;
+    transition-timing-function: ease;
+  }
+  /* Don't slow down animations/transforms */
+  body *, body *::before, body *::after {
+    transition-property: background-color, color, border-color, box-shadow,
+                         opacity, transform, border-color, width, height;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Light mode nav background */
+  body.light nav {
+    background: linear-gradient(to bottom, rgba(253,240,242,0.97) 0%, transparent 100%);
+  }
+
+  /* Light mode hero glow */
+  body.light .hero::before {
+    background: radial-gradient(ellipse 80% 60% at 50% 45%, rgba(192,54,74,0.10) 0%, transparent 70%);
+  }
+
+  /* Light mode canvas hearts slightly more opaque */
+  body.light #heartsCanvas { opacity: 0.6; }
+
+  /* Light mode inputs */
+  body.light input[type="text"],
+  body.light input[type="email"],
+  body.light input[type="number"],
+  body.light select,
+  body.light textarea {
+    background: rgba(192,54,74,0.04);
+    color: var(--ink);
+  }
+  body.light textarea { background: rgba(192,54,74,0.05); }
+  body.light select option { background: #fdf0f2; color: #2a0e14; }
+  body.light select {
+    background-color: var(--surface);
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='rgba(42,14,20,0.6)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    border-color: rgba(176,40,64,0.3);
+    box-shadow: none;
+  }
+  body.light input::placeholder,
+  body.light textarea::placeholder { color: rgba(42,14,20,0.3); }
+
+  /* Light mode footer */
+  body.light footer a { color: rgba(42,14,20,0.45); }
+
+  /* ── Theme toggle button ── */
+  .theme-btn {
+    position: relative;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    transition: border-color 0.3s, color 0.3s, transform 0.3s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    flex-shrink: 0;
+  }
+
+  .theme-btn:hover, .theme-btn:active {
+    border-color: var(--rose);
+    color: var(--rose);
+    transform: rotate(20deg);
+  }
+
+  .theme-btn .icon-sun  { display: none; }
+  .theme-btn .icon-moon { display: block; }
+
+  body.light .theme-btn .icon-sun  { display: block; }
+  body.light .theme-btn .icon-moon { display: none; }
+
+  /* ── Touch devices: restore default cursor, hide custom one ── */
+  @media (hover: none) and (pointer: coarse) {
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none !important; }
+  }
+
+  /* ── custom cursor (desktop only) ── */
+  .cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--rose);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, opacity 0.2s;
+    transform: translate(-50%,-50%);
+    will-change: transform, opacity;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 32px; height: 32px;
+    border: 1px solid rgba(232,96,122,0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.35s ease, width 0.25s, height 0.25s, opacity 0.2s;
+    transform: translate(-50%,-50%);
+    will-change: transform, width, height, opacity;
+  }
+  body:hover .cursor { opacity: 1; }
+
+  /* ── noise grain ── */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 997; mix-blend-mode: overlay;
+  }
+
+  /* ── ambient glow ── */
+  body::before {
+    content: '';
+    position: fixed; inset: -20%;
+    background:
+      radial-gradient(ellipse 35% 28% at 20% 15%, rgba(232,96,122,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 80% 25%, rgba(212,165,90,0.16) 0%, transparent 62%),
+      radial-gradient(ellipse 45% 35% at 50% 85%, rgba(245,192,200,0.12) 0%, transparent 65%);
+    pointer-events: none; z-index: 1; mix-blend-mode: screen; opacity: 0.9;
+  }
+  body.light::before {
+    opacity: 0.6;
+    mix-blend-mode: screen;
+  }
+
+  /* ── falling hearts canvas ── */
+  #heartsCanvas {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 0;
+    opacity: 0.9;
+    will-change: transform;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 500;
+    display: flex; justify-content: center; align-items: center;
+    flex-wrap: wrap;
+    padding: 18px 24px;
+    gap: 20px;
+    background: linear-gradient(to bottom, rgba(15,6,8,0.97) 0%, transparent 100%);
+    animation: fadeDown 0.8s ease both;
+  }
+
+  nav a {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: lowercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.25s;
+    -webkit-tap-highlight-color: transparent;
+    padding: 4px 2px;
+  }
+  nav a:hover, nav a:active { color: var(--blush); }
+
+  nav .nav-heart {
+    color: var(--crimson);
+    font-size: 14px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 10;
+    min-height: 100svh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 100px 24px 80px;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 45%, rgba(192,54,74,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-date {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 28px;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(58px, 15vw, 140px);
+    font-weight: 300;
+    line-height: 0.9;
+    letter-spacing: -0.01em;
+    color: var(--cream);
+    animation: fadeUp 0.8s 0.2s ease both;
+    position: relative;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    background: linear-gradient(135deg, var(--rose), var(--blush), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    max-width: 340px;
+    line-height: 2;
+    margin: 28px auto 0;
+    animation: fadeUp 0.7s 0.4s ease both;
+  }
+
+  .hero-sub strong { color: var(--blush); font-weight: 400; }
+
+  .hero-scarcity {
+    margin: 18px auto 0;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+    line-height: 2;
+    animation: fadeUp 0.7s 0.5s ease both;
+  }
+  .hero-scarcity strong { color: var(--gold); font-weight: 400; }
+
+  .hero-scroll {
+    position: absolute; bottom: 32px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    animation: fadeUp 0.7s 0.8s ease both;
+  }
+
+  .hero-scroll span {
+    font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--faint);
+  }
+
+  .scroll-line {
+    width: 1px; height: 36px;
+    background: linear-gradient(to bottom, var(--crimson), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  /* ── INTENT TOGGLE ── */
+  .intent-section {
+    position: relative; z-index: 10;
+    max-width: 700px; margin: 0 auto;
+    padding: 0 20px 52px;
+    text-align: center;
+  }
+
+  .intent-label {
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 20px; display: block;
+  }
+
+  .intent-toggle {
+    display: flex;          /* flex so it fills width on mobile */
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .intent-toggle input[type="radio"] {
+    position: absolute; opacity: 0; width: 0; height: 0;
+  }
+
+  .intent-toggle label {
+    flex: 1;                /* equal halves */
+    padding: 15px 12px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(15px, 4vw, 18px);
+    font-style: italic;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.3s;
+    position: relative; z-index: 1;
+    letter-spacing: 0.04em;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  .intent-toggle .divider-v {
+    width: 1px; background: var(--border); flex-shrink: 0;
+  }
+
+  .intent-toggle input[type="radio"]:checked + label {
+    color: var(--cream);
+  }
+
+  #intent-romance:checked + label { color: var(--blush); }
+  #intent-friends:checked + label { color: var(--pale-gold); }
+
+  /* sliding highlight */
+  .intent-highlight {
+    position: absolute; top: 0; bottom: 0; width: 50%;
+    transition: left 0.35s cubic-bezier(0.4,0,0.2,1);
+    left: 0;
+  }
+
+  .intent-highlight.romance {
+    background: linear-gradient(135deg, rgba(192,54,74,0.25), rgba(232,96,122,0.1));
+    border-right: 1px solid rgba(232,96,122,0.3);
+    left: 0;
+  }
+
+  .intent-highlight.friends {
+    background: linear-gradient(135deg, rgba(212,165,90,0.2), rgba(237,218,170,0.08));
+    border-left: 1px solid rgba(212,165,90,0.3);
+    left: 50%;
+  }
+
+  .intent-note {
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--faint);
+    font-style: italic;
+    min-height: 18px;
+    transition: opacity 0.3s;
+    padding: 0 8px;
+  }
+
+  /* ── ORNAMENT ── */
+  .ornament {
+    display: flex; align-items: center; gap: 20px;
+    max-width: 600px; margin: 0 auto 52px;
+    padding: 0 24px;
+    position: relative; z-index: 10;
+  }
+
+  .orn-line {
+    flex: 1; height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+  }
+
+  .orn-sym {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--crimson);
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  /* ── FORM ── */
+  .form-wrap {
+    position: relative; z-index: 10;
+    max-width: 640px; margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  .form-header {
+    text-align: center; margin-bottom: 48px;
+  }
+
+  .form-header p {
+    font-size: 12.5px; line-height: 2;
+    color: var(--muted); max-width: 480px; margin: 0 auto;
+  }
+
+  .form-header .sign {
+    display: block; margin-top: 18px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 18px;
+    color: var(--rose);
+  }
+
+  .trust-block {
+    text-align: center;
+    margin: 0 auto 48px;
+    max-width: 520px;
+  }
+  .trust-block h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(20px, 5vw, 26px);
+    font-style: italic;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 16px;
+  }
+  .trust-block p {
+    font-size: 12.5px; line-height: 2;
+    color: var(--muted);
+  }
+
+  /* Section sub-header */
+  .form-section-title {
+    font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 28px; margin-top: 48px;
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .form-section-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(to right, var(--border), transparent);
+  }
+
+  /* Field groups */
+  .form-group {
+    margin-bottom: 36px;
+    opacity: 0; transform: translateY(18px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .form-group.visible {
+    opacity: 1; transform: translateY(0);
+  }
+
+  .form-label {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(17px, 4.5vw, 20px);
+    font-style: italic;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 12px;
+    line-height: 1.35;
+  }
+
+  .form-label .q-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-style: normal;
+    letter-spacing: 0.15em;
+    color: var(--crimson);
+    display: block;
+    margin-bottom: 5px;
+    opacity: 0.8;
+  }
+
+  /* Inputs — 16px font prevents iOS auto-zoom */
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  select,
+  textarea {
+    width: 100%;
+    background: var(--surface);
+    border: none;
+    border-bottom: 1px solid var(--border);
+    padding: 14px 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;          /* ← prevents iOS zoom */
+    font-weight: 300;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.3s, background 0.3s;
+    appearance: none; -webkit-appearance: none;
+    border-radius: 0;
+    caret-color: var(--rose);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  textarea {
+    resize: vertical; min-height: 90px;
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.04);
+    line-height: 1.8;
+    font-size: 16px;          /* ← prevents iOS zoom */
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--rose);
+    background: rgba(232,96,122,0.04);
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: rgba(249,237,232,0.2);
+    font-style: italic;
+    font-size: 14px;
+  }
+
+  select {
+    cursor: pointer;
+    color: var(--muted);
+    background-color: var(--surface);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    background-position: right 8px center !important;
+    padding-right: 8px;
+    padding-left: 4px;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  select.placeholder { color: var(--cream); }
+
+  select::-ms-expand { display: none; }
+
+  select option { background: #1a0a0e; color: var(--ink); }
+
+  /* Force-remove native select arrows/backgrounds (macOS/Chrome/Safari) */
+  select,
+  body.light select {
+    background: var(--surface) !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+  }
+  body.light select {
+    background: rgba(192,54,74,0.04) !important;
+  }
+
+
+  /* pill radios — bigger touch targets on mobile */
+  .pill-group {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px;
+  }
+
+  .pill {
+    position: relative;
+  }
+
+  .pill input[type="radio"],
+  .pill input[type="checkbox"] {
+    position: absolute; opacity: 0; width: 0; height: 0;
+  }
+
+  .pill label {
+    display: block;
+    padding: 10px 18px;       /* taller for touch */
+    border: 1px solid var(--border);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.2s;
+    position: relative; z-index: 1;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    min-height: 44px;          /* WCAG touch target */
+    display: flex; align-items: center;
+  }
+
+  .pill input[type="radio"]:checked + label {
+    background: rgba(192,54,74,0.2);
+    border-color: var(--rose);
+    color: var(--blush);
+  }
+
+  .pill input[type="checkbox"]:checked + label {
+    background: rgba(212,165,90,0.15);
+    border-color: var(--gold);
+    color: var(--pale-gold);
+  }
+
+  .pill label:hover,
+  .pill label:active {
+    border-color: rgba(232,96,122,0.5);
+    color: var(--cream);
+  }
+
+  .vibe-other,
+  .source-other {
+    display: none;
+    margin-top: 12px;
+  }
+  .vibe-other.on,
+  .source-other.on { display: block; }
+
+  .vibe-helper {
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--faint);
+    font-style: italic;
+    min-height: 16px;
+    transition: opacity 0.3s;
+    opacity: 0;
+  }
+  .vibe-helper.on { opacity: 1; color: var(--gold); }
+
+  /* ── INTENT-SENSITIVE fields ── */
+  .romance-only, .friends-only {
+    transition: opacity 0.4s, max-height 0.5s ease;
+    overflow: hidden;
+  }
+
+  .romance-only { max-height: 900px; }
+  .friends-only { max-height: 0; opacity: 0; }
+
+  body.intent-friends .romance-only { max-height: 0; opacity: 0; pointer-events: none; }
+  body.intent-friends .friends-only { max-height: 900px; opacity: 1; pointer-events: auto; }
+  body.intent-romance .romance-only { max-height: 900px; opacity: 1; pointer-events: auto; }
+  body.intent-romance .friends-only { max-height: 0; opacity: 0; pointer-events: none; }
+
+  /* Checkbox row */
+  .check-row {
+    display: flex; align-items: flex-start; gap: 14px; margin-top: 6px;
+  }
+
+  .check-row input[type="checkbox"] {
+    width: 20px; height: 20px; margin-top: 1px;
+    accent-color: var(--rose);
+    cursor: pointer; flex-shrink: 0;
+    border-radius: 0;
+    min-width: 20px;
+  }
+
+  .check-row label {
+    font-size: 12.5px; line-height: 1.75; color: var(--muted); cursor: pointer;
+  }
+
+  .check-row a { color: var(--rose); text-decoration: none; }
+  .check-row a:hover, .check-row a:active { text-decoration: underline; }
+
+  /* ── SUBMIT ── */
+  .submit-area {
+    margin-top: 48px; text-align: center;
+  }
+
+  .submit-btn {
+    position: relative;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--crimson);
+    padding: 18px 40px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(18px, 5vw, 22px);
+    cursor: pointer;
+    transition: all 0.3s;
+    overflow: hidden;
+    letter-spacing: 0.04em;
+    width: 100%;              /* full-width on mobile */
+    max-width: 400px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    min-height: 58px;
+  }
+
+  .submit-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--crimson), var(--rose));
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.35s ease;
+  }
+
+  .submit-btn:hover::before,
+  .submit-btn:active::before { transform: scaleY(1); }
+  .submit-btn:hover,
+  .submit-btn:active {
+    border-color: var(--rose);
+    color: var(--cream);
+    box-shadow: 0 0 30px rgba(192,54,74,0.25);
+  }
+  .submit-btn span { position: relative; z-index: 1; }
+
+  .submit-note {
+    margin-top: 16px;
+    font-size: 10.5px; letter-spacing: 0.1em;
+    color: var(--faint); font-style: italic;
+    padding: 0 8px;
+    line-height: 1.7;
+  }
+
+  /* ── SUCCESS ── */
+  .success-state {
+    display: none;
+    text-align: center;
+    padding: 60px 16px;
+    animation: fadeUp 0.7s ease both;
+  }
+
+  .success-state.on { display: block; }
+
+  .success-hearts {
+    font-size: 48px;
+    margin-bottom: 24px;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  .success-state h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 10vw, 52px);
+    font-style: italic;
+    font-weight: 300;
+    color: var(--blush);
+    margin-bottom: 20px;
+    line-height: 1.1;
+  }
+
+  .success-state p {
+    font-size: 13px; line-height: 2;
+    color: var(--muted); max-width: 340px; margin: 0 auto;
+  }
+
+  .success-sign {
+    display: block; margin-top: 28px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 20px;
+    color: var(--rose);
+  }
+
+  .invite-btn {
+    margin: 26px auto 0;
+    max-width: 320px;
+  }
+  .invite-note {
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--faint);
+    font-style: italic;
+    min-height: 16px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 10;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    padding: 28px 24px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--faint);
+    line-height: 2;
+  }
+
+  footer a { color: rgba(249,237,232,0.35); text-decoration: none; }
+  footer a:hover, footer a:active { color: var(--rose); }
+
+  footer .made-with {
+    display: block; margin-top: 10px; opacity: 0.5;
+    font-style: italic; letter-spacing: 0.06em;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.12); }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50%       { opacity: 0.9; transform: scaleY(1.3); }
+  }
+
+  /* ── RESPONSIVE BREAKPOINTS ── */
+
+  /* Small mobile (≤390px) */
+  @media (max-width: 390px) {
+    nav { gap: 8px; padding: 12px 12px; }
+    nav a { font-size: 9px; letter-spacing: 0.1em; }
+    nav .nav-heart { display: none; }
+    .theme-btn { width: 32px; height: 32px; font-size: 13px; }
+    .hero { padding: 90px 16px 70px; }
+    .hero h1 { font-size: 52px; }
+    .intent-toggle label { font-size: 14px; padding: 13px 8px; }
+    .form-wrap { padding: 0 16px 72px; }
+    .pill label { padding: 10px 12px; font-size: 11px; }
+  }
+
+  /* Standard mobile (≤480px) */
+  @media (max-width: 480px) {
+    nav { gap: 14px; }
+    .hero-sub { font-size: 11.5px; letter-spacing: 0.04em; }
+    .form-group { margin-bottom: 32px; }
+    .ornament { margin-bottom: 40px; }
+    .form-section-title { margin-top: 40px; margin-bottom: 24px; }
+    .submit-area { margin-top: 40px; }
+  }
+
+  /* Tablet (481–768px) */
+  @media (min-width: 481px) and (max-width: 768px) {
+    .form-wrap { padding: 0 28px 90px; }
+    .intent-section { padding: 0 28px 52px; }
+  }
+
+  /* Reduce motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+    .form-group { opacity: 1 !important; transform: none !important; }
+  }
+</style>
+</head>
+<body class="intent-romance">
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Falling hearts canvas -->
+<canvas id="heartsCanvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a href="#">home</a>
+  <span class="nav-heart">♥</span>
+  <a href="#form">the form</a>
+  <span class="nav-heart">♥</span>
+  <a href="#about">about</a>
+  <span class="nav-heart">♥</span>
+  <a href="#terms">terms</a>
+  <span class="nav-heart">♥</span>
+  <button class="theme-btn" id="themeBtn" aria-label="Toggle light/dark mode">
+    <span class="icon-moon">☽</span>
+    <span class="icon-sun">☀</span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-date">February 14 &nbsp;·&nbsp; A matchmaking for the brave</p>
+  <h1>Sweetheart<br><em>Strangers.</em></h1>
+  <p class="hero-sub">
+    A hand-curated Valentine's matchmaker.<br>
+    <strong>For the hopeless romantics</strong> — and for those who just want a new favourite person.
+  </p>
+  <div class="hero-scarcity">
+    Only 300 spots available. <strong><span id="spotCounter"></span></strong> already claimed.<br>
+    Matching closes in: <strong><span id="countdown"></span></strong>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>scroll to begin</span>
+  </div>
+</section>
+
+<!-- INTENT TOGGLE -->
+<div class="intent-section" style="position:relative;z-index:10;">
+  <span class="intent-label">i am looking for...</span>
+
+  <div class="intent-toggle" id="intentToggle">
+    <div class="intent-highlight romance" id="intentHighlight"></div>
+    <input type="radio" name="intent" id="intent-romance" value="Love / Romance" data-intent="romance" checked>
+    <label for="intent-romance">♥ &nbsp;love &amp; romance</label>
+    <div class="divider-v"></div>
+    <input type="radio" name="intent" id="intent-friends" value="Friendship" data-intent="friends">
+    <label for="intent-friends">✦ &nbsp;a kindred friend</label>
+  </div>
+
+  <p class="intent-note" id="intentNote">
+    tell me your heart's desire &amp;&amp; i'll find your person.
+  </p>
+</div>
+
+<div class="ornament">
+  <div class="orn-line"></div>
+  <div class="orn-sym">❧</div>
+  <div class="orn-line"></div>
+</div>
+
+<!-- FORM -->
+<div class="form-wrap" id="form">
+
+  <div class="form-header">
+    <p>
+      Fill out this form with your whole self — I read every word personally
+      &amp;&amp; match you by hand. Your email only goes to your match.
+    </p>
+    <span class="sign">love you &amp;&amp; good luck, — yash ♥</span>
+  </div>
+
+  <div class="trust-block">
+    <h3>How this works</h3>
+    <p>1. You answer a few thoughtful questions (about 5 minutes).</p>
+    <p>2. A real human reads submissions and matches you with ONE person.</p>
+    <p>3. You both receive an introduction email on Feb 14.</p>
+    <p>18+ only. No mailing lists. Your info is only shared with your match.</p>
+  </div>
+
+  <form id="matchForm" novalidate>
+
+    <!-- ── The Basics ── -->
+    <div class="form-section-title">the basics</div>
+
+    <div class="form-group">
+      <label class="form-label" for="name">
+        <span class="q-num">01 ——</span>What's your name?
+      </label>
+      <input type="text" id="name" name="name" placeholder="the one that feels most like you" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="email">
+        <span class="q-num">02 ——</span>Your email address?
+      </label>
+      <input type="email" id="email" name="email" placeholder="where I'll send your match" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="insta">
+        <span class="q-num">03 ——</span>Instagram handle?
+      </label>
+      <input type="text" id="insta" name="insta" placeholder="@handle (optional)">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="source">
+        <span class="q-num">03b ——</span>How did you hear about this?
+      </label>
+      <select id="source" name="source">
+        <option value="" disabled selected>select one...</option>
+        <option value="Instagram">Instagram</option>
+        <option value="TikTok">TikTok</option>
+        <option value="Friend">Friend</option>
+        <option value="__other_option__">Other</option>
+      </select>
+      <div class="source-other" id="sourceOtherWrap">
+        <input type="text" id="sourceOther" name="source_other" placeholder="tell me where you found it">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="age">
+        <span class="q-num">04 ——</span>How old are you?
+      </label>
+      <input type="number" id="age" name="age" placeholder="in years" min="18" max="99" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">
+        <span class="q-num">05 ——</span>Gender identity?
+      </label>
+      <div class="pill-group">
+        <div class="pill"><input type="radio" name="gender" id="g-woman" value="Woman"><label for="g-woman">woman</label></div>
+        <div class="pill"><input type="radio" name="gender" id="g-man" value="Man"><label for="g-man">man</label></div>
+        <div class="pill"><input type="radio" name="gender" id="g-nb" value="Nonbinary"><label for="g-nb">nonbinary</label></div>
+        <div class="pill"><input type="radio" name="gender" id="g-other" value="Other"><label for="g-other">other</label></div>
+        <div class="pill"><input type="radio" name="gender" id="g-pnts" value="Prefer not to say"><label for="g-pnts">prefer not to say</label></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="city">
+        <span class="q-num">06 ——</span>What city do you live in?
+      </label>
+      <input type="text" id="city" name="city" placeholder="e.g. New York, London, Tokyo..." required>
+    </div>
+
+    <!-- ── The Heart of It ── -->
+    <div class="form-section-title">the heart of it</div>
+
+    <!-- Romance-specific -->
+    <div class="romance-only">
+      <div class="form-group">
+        <label class="form-label">
+          <span class="q-num">07r ——</span>Who are you attracted to?
+        </label>
+        <div class="pill-group">
+          <div class="pill"><input type="radio" name="attracted_to" id="at-women" value="Women"><label for="at-women">women</label></div>
+          <div class="pill"><input type="radio" name="attracted_to" id="at-men" value="Men"><label for="at-men">men</label></div>
+          <div class="pill"><input type="radio" name="attracted_to" id="at-nb" value="Anyone"><label for="at-nb">anyone</label></div>
+          <div class="pill"><input type="radio" name="attracted_to" id="at-all" value="Open"><label for="at-all">open</label></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="love_lang">
+          <span class="q-num">08r ——</span>What's your love language?
+        </label>
+        <select id="love_lang" name="love_lang">
+          <option value="" disabled selected>select one...</option>
+          <option value="words">words of affirmation</option>
+          <option value="acts">acts of service</option>
+          <option value="gifts">gift giving</option>
+          <option value="time">quality time</option>
+          <option value="touch">physical touch</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="romance_style">
+          <span class="q-num">09r ——</span>Describe your ideal date in one sentence.
+        </label>
+        <textarea id="romance_style" name="romance_style" placeholder="no wrong answers. be specific."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="dealbreaker">
+          <span class="q-num">10r ——</span>One dealbreaker, honestly.
+        </label>
+        <input type="text" id="dealbreaker" name="dealbreaker" placeholder="be real with me">
+      </div>
+    </div>
+
+    <!-- Friends-specific -->
+    <div class="friends-only">
+      <div class="form-group">
+        <label class="form-label">
+          <span class="q-num">07f ——</span>Prefer your match to be...
+        </label>
+        <div class="pill-group">
+          <div class="pill"><input type="radio" name="friend_pref" id="fp-women" value="Women"><label for="fp-women">women</label></div>
+          <div class="pill"><input type="radio" name="friend_pref" id="fp-men" value="Men"><label for="fp-men">men</label></div>
+          <div class="pill"><input type="radio" name="friend_pref" id="fp-nb" value="Anyone"><label for="fp-nb">anyone</label></div>
+          <div class="pill"><input type="radio" name="friend_pref" id="fp-open" value="Open"><label for="fp-open">open</label></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="friendship_style">
+          <span class="q-num">08f ——</span>What does a great friendship look like to you?
+        </label>
+        <textarea id="friendship_style" name="friendship_style" placeholder="texting daily? monthly dinners? shared playlists?"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="friend_dealbreaker">
+          <span class="q-num">09f ——</span>What makes a friendship not work for you?
+        </label>
+        <input type="text" id="friend_dealbreaker" name="friend_dealbreaker" placeholder="honesty appreciated">
+      </div>
+    </div>
+
+    <!-- Shared questions -->
+    <div class="form-group" id="vibeGroup">
+      <label class="form-label">
+        <span class="q-num">10 ——</span>Vibe check — choose up to four
+      </label>
+      <div class="pill-group">
+        <div class="pill"><input type="checkbox" name="vibe" id="vibe-cozy" value="Cozy / Homebody"><label for="vibe-cozy">cozy / homebody</label></div>
+        <div class="pill"><input type="checkbox" name="vibe" id="vibe-outdoor" value="Outdoorsy"><label for="vibe-outdoor">outdoorsy</label></div>
+        <div class="pill"><input type="checkbox" name="vibe" id="vibe-arts" value="Arts & Culture"><label for="vibe-arts">arts &amp; culture</label></div>
+        <div class="pill"><input type="checkbox" name="vibe" id="vibe-deep" value="Deep Conversations"><label for="vibe-deep">deep conversations</label></div>
+        <div class="pill"><input type="checkbox" name="vibe" id="vibe-chaotic" value="Chaotic Fun"><label for="vibe-chaotic">chaotic fun</label></div>
+        <div class="pill"><input type="checkbox" name="vibe" id="vibe-fitness" value="Fitness / Active"><label for="vibe-fitness">fitness / active</label></div>
+        <div class="pill"><input type="checkbox" name="vibe" id="vibe-foodie" value="Foodie"><label for="vibe-foodie">foodie</label></div>
+        <div class="pill"><input type="checkbox" name="vibe" id="vibe-music" value="Music Lover"><label for="vibe-music">music lover</label></div>
+        <div class="pill"><input type="checkbox" name="vibe" id="vibe-other" value="__other_option__"><label for="vibe-other">other</label></div>
+      </div>
+      <div class="vibe-other" id="vibeOtherWrap">
+        <input type="text" id="vibeOther" name="vibe_other" placeholder="your vibe, in your words">
+      </div>
+      <div class="vibe-helper" id="vibeHelper">Pick up to 4 — mystery is attractive.</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="freetime">
+        <span class="q-num">11 ——</span>How do you spend your free time?
+      </label>
+      <textarea id="freetime" name="freetime" placeholder="be specific — niche answers win." required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="artist">
+        <span class="q-num">12 ——</span>Most-listened-to artist this year?
+      </label>
+      <input type="text" id="artist" name="artist" placeholder="no judgment, I promise" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="movie">
+        <span class="q-num">13 ——</span>Favourite film of all time?
+      </label>
+      <input type="text" id="movie" name="movie" placeholder="the one you could watch on a loop">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="secret">
+        <span class="q-num">14 ——</span>Something about you that surprises people?
+      </label>
+      <textarea id="secret" name="secret" placeholder="a hidden talent, a strange habit, a surprising fact..."></textarea>
+    </div>
+
+    <!-- ── Terms ── -->
+    <div class="form-section-title">before you submit</div>
+
+    <div class="form-group">
+      <div class="check-row">
+        <input type="checkbox" id="terms" name="terms" required>
+        <label for="terms">
+          I agree to the <a href="#terms">Terms &amp;&amp; Conditions</a>. I understand my email will only ever be shared with my match — no spam, no lists, no selling.
+        </label>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span id="submitLabel">send my heart into the world →</span>
+      </button>
+      <p class="submit-note">every form is read by a real human. matches sent within 1–2 weeks.</p>
+    </div>
+
+  </form>
+
+  <!-- Success -->
+  <div class="success-state" id="successState">
+    <div class="success-hearts">♥</div>
+    <h2>you're in the<br>love lottery.</h2>
+    <p>
+      thank you for trusting this little experiment with your heart.
+      i'll read your form carefully &amp;&amp; find your person.
+      sit tight — good things are worth waiting for.
+    </p>
+    <span class="success-sign">— with so much love, yash ♥</span>
+    <button type="button" class="submit-btn invite-btn" id="inviteBtn">
+      <span>Invite a Friend →</span>
+    </button>
+    <p class="invite-note" id="inviteNote"></p>
+  </div>
+
+</div>
+
+<!-- About -->
+<div class="ornament" id="about">
+  <div class="orn-line"></div>
+  <div class="orn-sym">❧</div>
+  <div class="orn-line"></div>
+</div>
+
+<section style="position:relative;z-index:10;max-width:580px;margin:0 auto 80px;padding:0 24px;text-align:center;">
+  <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(22px,4vw,30px);font-style:italic;font-weight:300;color:var(--cream);line-height:1.5;margin-bottom:24px;">
+    "Making yourself vulnerable enough to meet someone new is the bravest &amp; most human thing."
+  </p>
+  <p style="font-size:12px;line-height:2;color:var(--muted);">
+    Sweetheart Strangers is a single-person operation. I read every submission, make every match by hand, and only share your email with one carefully chosen person. Whether you're looking for love or a lifelong friend — you deserve someone who gets you.
+  </p>
+</section>
+
+<!-- Terms -->
+<div class="ornament" id="terms">
+  <div class="orn-line"></div>
+  <div class="orn-sym">❧</div>
+  <div class="orn-line"></div>
+</div>
+
+<section style="position:relative;z-index:10;max-width:620px;margin:0 auto 80px;padding:0 24px;text-align:center;">
+  <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(22px,4vw,30px);font-style:italic;font-weight:300;color:var(--cream);line-height:1.5;margin-bottom:18px;">
+    Terms &amp;&amp; Conditions
+  </p>
+  <p style="font-size:12px;line-height:2;color:var(--muted);">
+    You must be 18+ to participate. This is a hand‑matched, human‑reviewed experience. By submitting,
+    you consent to being contacted by email and to having your email shared with one matched person.
+    Your information will not be sold or added to mailing lists. You can request removal at any time by replying
+    to your confirmation email.
+  </p>
+</section>
+
+<footer>
+  <span>sweetheart strangers &nbsp;♥&nbsp; valentine's matchmaker</span><br>
+  <a href="#">home</a> &nbsp;·&nbsp;
+  <a href="#about">about</a> &nbsp;·&nbsp;
+  <a href="#terms">terms &amp;&amp; conditions</a>
+  <span class="made-with">crafted with genuine hope &amp;&amp; a lot of rose tea ♥</span>
+</footer>
+
+<script>
+// ── Detect touch device ──
+const isTouchDevice = () => window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+// ── Custom cursor (desktop only) ──
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursorRing');
+
+if (!isTouchDevice()) {
+  let mx = -100, my = -100, rx = -100, ry = -100;
+
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+  function animateCursor() {
+    cursor.style.left = mx + 'px';
+    cursor.style.top  = my + 'px';
+    rx += (mx - rx) * 0.32;
+    ry += (my - ry) * 0.32;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  document.querySelectorAll('a, button, label, input, select, textarea').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'translate(-50%,-50%) scale(2.5)';
+      ring.style.width = '50px'; ring.style.height = '50px';
+      ring.style.borderColor = 'rgba(232,96,122,0.6)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'translate(-50%,-50%) scale(1)';
+      ring.style.width = '32px'; ring.style.height = '32px';
+      ring.style.borderColor = 'rgba(232,96,122,0.4)';
+    });
+  });
+} else {
+  // Hide cursors on touch
+  cursor.style.display = 'none';
+  ring.style.display   = 'none';
+  document.body.style.cursor = 'auto';
+}
+
+// ── Falling hearts canvas ──
+const canvas = document.getElementById('heartsCanvas');
+const ctx    = canvas.getContext('2d');
+let hearts   = [];
+const HEART_CHARS = ['♥','♡','❤','❦','❧','✦'];
+const COLORS = ['#c0364a','#e8607a','#f5c0c8','#d4a55a','#eddaaa','rgba(255,255,255,0.85)'];
+
+function resize() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+function spawnHeart() {
+  return {
+    x:    Math.random() * canvas.width,
+    y:    -20,
+    size: 14 + Math.random() * 30,
+    speed: 0.9 + Math.random() * 1.6,
+    drift: (Math.random() - 0.5) * 0.9,
+    rot:  Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.035,
+    opacity: 0.45 + Math.random() * 0.6,
+    char: HEART_CHARS[Math.floor(Math.random() * HEART_CHARS.length)],
+    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+  };
+}
+
+// Fewer hearts on mobile for performance
+const isMobile = window.innerWidth < 600;
+const INITIAL_HEARTS = isMobile ? 20 : 42;
+const MAX_HEARTS     = isMobile ? 36 : 80;
+const SPAWN_RATE     = isMobile ? 55 : 35;
+
+for (let i = 0; i < INITIAL_HEARTS; i++) {
+  const h = spawnHeart();
+  h.y = Math.random() * canvas.height;
+  hearts.push(h);
+}
+
+let frameCount = 0;
+function drawHearts() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  frameCount++;
+  if (frameCount % SPAWN_RATE === 0 && hearts.length < MAX_HEARTS) hearts.push(spawnHeart());
+
+  hearts = hearts.filter(h => h.y < canvas.height + 30);
+
+  hearts.forEach(h => {
+    h.y += h.speed;
+    h.x += h.drift;
+    h.rot += h.rotSpeed;
+    ctx.save();
+    ctx.translate(h.x, h.y);
+    ctx.rotate(h.rot);
+    ctx.globalAlpha = h.opacity;
+    ctx.fillStyle = h.color;
+    ctx.font = `${h.size}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(h.char, 0, 0);
+    ctx.restore();
+  });
+
+  requestAnimationFrame(drawHearts);
+}
+drawHearts();
+
+// ── Intent toggle ──
+const intentInputs = document.querySelectorAll('input[name="intent"]');
+const highlight = document.getElementById('intentHighlight');
+const intentNote = document.getElementById('intentNote');
+const submitLabel = document.getElementById('submitLabel');
+
+const notes = {
+  romance: "tell me your heart's desire &amp;&amp; i'll find your valentine.",
+  friends: "tell me who you are &amp;&amp; i'll find your kindred spirit."
+};
+
+const btnLabels = {
+  romance: "send my heart into the world →",
+  friends: "find me my kindred stranger →"
+};
+
+intentInputs.forEach(input => {
+  input.addEventListener('change', () => {
+    const val = input.dataset.intent || input.value;
+    document.body.classList.remove('intent-romance', 'intent-friends');
+    document.body.classList.add(`intent-${val}`);
+    if (val === 'romance') {
+      highlight.className = 'intent-highlight romance';
+    } else {
+      highlight.className = 'intent-highlight friends';
+    }
+    intentNote.innerHTML = notes[val];
+    submitLabel.textContent = btnLabels[val];
+  });
+});
+
+// ── Scroll reveal for form groups ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.form-group').forEach(g => observer.observe(g));
+
+function setupSelectPlaceholders() {
+  document.querySelectorAll('select').forEach(sel => {
+    const update = () => {
+      if (!sel.value) sel.classList.add('placeholder');
+      else sel.classList.remove('placeholder');
+    };
+    update();
+    sel.addEventListener('change', update);
+  });
+}
+
+setupSelectPlaceholders();
+
+// ── Scarcity + countdown ──
+const spotCounter = document.getElementById('spotCounter');
+const countdownEl = document.getElementById('countdown');
+const submitBtn = document.getElementById('submitBtn');
+
+if (spotCounter) {
+  const taken = 187 + Math.floor(Math.random() * 12);
+  spotCounter.textContent = taken;
+}
+
+const deadline = new Date(2026, 1, 13, 23, 59, 59);
+function updateCountdown() {
+  if (!countdownEl) return;
+  const now = new Date();
+  const diff = deadline - now;
+  if (diff <= 0) {
+    countdownEl.textContent = 'Closed';
+    if (submitBtn) submitBtn.disabled = true;
+    return;
+  }
+  const totalSeconds = Math.floor(diff / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  countdownEl.textContent = `${hours}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+// ── Vibe limit ──
+const vibeInputs = document.querySelectorAll('input[name="vibe"]');
+const vibeHelper = document.getElementById('vibeHelper');
+const vibeOtherWrap = document.getElementById('vibeOtherWrap');
+const vibeOtherInput = document.getElementById('vibeOther');
+let vibeHelperTimer = null;
+
+function showVibeHelper() {
+  if (!vibeHelper) return;
+  vibeHelper.classList.add('on');
+  if (vibeHelperTimer) clearTimeout(vibeHelperTimer);
+  vibeHelperTimer = setTimeout(() => vibeHelper.classList.remove('on'), 2200);
+}
+
+if (vibeInputs.length > 0) {
+  vibeInputs.forEach(input => {
+    input.addEventListener('change', () => {
+      const checked = document.querySelectorAll('input[name="vibe"]:checked').length;
+      if (checked > 4) {
+        input.checked = false;
+        showVibeHelper();
+        return;
+      }
+      const otherChecked = document.getElementById('vibe-other');
+      if (otherChecked && vibeOtherWrap) {
+        if (otherChecked.checked) {
+          vibeOtherWrap.classList.add('on');
+        } else {
+          vibeOtherWrap.classList.remove('on');
+          if (vibeOtherInput) vibeOtherInput.value = '';
+        }
+      }
+    });
+  });
+}
+
+// ── Source "Other" toggle ──
+const sourceSelect = document.getElementById('source');
+const sourceOtherWrap = document.getElementById('sourceOtherWrap');
+const sourceOtherInput = document.getElementById('sourceOther');
+
+if (sourceSelect) {
+  sourceSelect.addEventListener('change', () => {
+    if (sourceSelect.value === '__other_option__') {
+      if (sourceOtherWrap) sourceOtherWrap.classList.add('on');
+    } else {
+      if (sourceOtherWrap) sourceOtherWrap.classList.remove('on');
+      if (sourceOtherInput) sourceOtherInput.value = '';
+    }
+  });
+}
+
+// ── Form submit ──
+const form = document.getElementById('matchForm');
+
+function getInputValue(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function getCheckedValue(selector) {
+  const el = document.querySelector(selector);
+  return el ? el.value : '';
+}
+
+function collectValues() {
+  const intent = getCheckedValue('input[name="intent"]:checked');
+  const gender = getCheckedValue('input[name="gender"]:checked');
+  let preference = getCheckedValue('input[name="preference"]:checked');
+  if (!preference) {
+    preference = getCheckedValue('input[name="attracted_to"]:checked') || getCheckedValue('input[name="friend_pref"]:checked');
+  }
+
+  const freeTimeEl =
+    document.getElementById('free_time') ||
+    document.getElementById('freetime');
+
+  const dealbreakerEl =
+    document.getElementById('dealbreaker') ||
+    document.getElementById('friend_dealbreaker');
+
+  const vibes = Array.from(document.querySelectorAll('input[name="vibe"]:checked')).map(v => v.value);
+
+  return {
+    name: getInputValue('name'),
+    email: getInputValue('email'),
+    instagram: getInputValue('insta'),
+    age: getInputValue('age'),
+    intent: intent || '',
+    gender: gender || '',
+    preference: preference || '',
+    vibes,
+    free_time: freeTimeEl ? freeTimeEl.value.trim() : '',
+    artist: getInputValue('artist'),
+    secret: getInputValue('secret'),
+    dealbreaker: dealbreakerEl ? dealbreakerEl.value.trim() : '',
+    source: getInputValue('source'),
+    vibe_other: getInputValue('vibeOther'),
+    source_other: getInputValue('sourceOther')
+  };
+}
+
+function sendToGoogle(payload) {
+  const url = 'https://docs.google.com/forms/d/e/1FAIpQLSeyoJYW5mIzW1wrbeZ-fztgK0ZCkEmMs6Dl6VHsEAvcJJwIdg/formResponse';
+  const params = new URLSearchParams();
+
+  params.append('entry.805816139', payload.name || '');
+  params.append('entry.261136458', payload.email || '');
+  params.append('entry.2049779526', payload.instagram || '');
+  params.append('entry.356236348', payload.age || '');
+  params.append('entry.1915604390', payload.intent || '');
+  params.append('entry.114402425', payload.gender || '');
+  params.append('entry.1248961202', payload.preference || '');
+  let hasVibeOther = false;
+  (payload.vibes || []).forEach(v => {
+    if (v === '__other_option__') {
+      hasVibeOther = true;
+    } else {
+      params.append('entry.1508837116', v);
+    }
+  });
+  if (hasVibeOther) {
+    params.append('entry.1508837116', '__other_option__');
+    if (payload.vibe_other) {
+      params.append('entry.1508837116.other_option_response', payload.vibe_other);
+    }
+  }
+  params.append('entry.2010766026', payload.free_time || '');
+  params.append('entry.1121548100', payload.artist || '');
+  params.append('entry.1469195081', payload.secret || '');
+  params.append('entry.781887920', payload.dealbreaker || '');
+  if (payload.source === '__other_option__') {
+    params.append('entry.804639048', '__other_option__');
+    if (payload.source_other) {
+      params.append('entry.804639048.other_option_response', payload.source_other);
+    }
+  } else {
+    params.append('entry.804639048', payload.source || '');
+  }
+
+  fetch(url, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: params
+  });
+}
+
+function showSuccessUI(formEl) {
+  formEl.style.transition = 'opacity 0.4s, transform 0.4s';
+  formEl.style.opacity = '0';
+  formEl.style.transform = 'translateY(12px)';
+
+  setTimeout(() => {
+    formEl.style.display = 'none';
+    document.getElementById('successState').classList.add('on');
+    // burst of hearts
+    for (let i = 0; i < 12; i++) {
+      const h = spawnHeart();
+      h.y = window.innerHeight * 0.4;
+      h.x = window.innerWidth / 2 + (Math.random() - 0.5) * 200;
+      h.speed = 1.5 + Math.random() * 2;
+      h.opacity = 0.6 + Math.random() * 0.4;
+      hearts.push(h);
+    }
+  }, 420);
+}
+
+function markInvalid(el) {
+  if (!el) return;
+  const prevBorder = el.style.borderColor;
+  el.style.borderColor = '#c0364a';
+  el.style.animation = 'none';
+  setTimeout(() => {
+    el.style.borderColor = prevBorder;
+    el.style.animation = '';
+  }, 700);
+}
+
+function markIntentInvalid() {
+  const toggle = document.getElementById('intentToggle');
+  if (!toggle) return;
+  const prev = toggle.style.borderColor;
+  toggle.style.borderColor = '#c0364a';
+  setTimeout(() => { toggle.style.borderColor = prev; }, 700);
+}
+
+function scrollToField(el) {
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  if (submitBtn && submitBtn.disabled) return;
+
+  const name = getInputValue('name');
+  const email = getInputValue('email');
+  const instagram = getInputValue('insta');
+  const ageValue = getInputValue('age');
+  const terms = document.getElementById('terms').checked;
+  const data = collectValues();
+  const vibeGroup = document.getElementById('vibeGroup');
+  const intentValue = getCheckedValue('input[name="intent"]:checked');
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const ageNum = parseInt(ageValue, 10);
+  const vibeOtherChecked = document.getElementById('vibe-other') && document.getElementById('vibe-other').checked;
+
+  const invalidTargets = [];
+  if (!name) invalidTargets.push(document.getElementById('name'));
+  if (!email || !emailValid) invalidTargets.push(document.getElementById('email'));
+  if (!instagram) invalidTargets.push(document.getElementById('insta'));
+  if (!ageValue || Number.isNaN(ageNum) || ageNum < 18) invalidTargets.push(document.getElementById('age'));
+  if (!intentValue) invalidTargets.push(document.getElementById('intentToggle'));
+  if (vibeInputs.length > 0 && data.vibes.length === 0) invalidTargets.push(vibeGroup);
+  if (vibeOtherChecked && !data.vibe_other) invalidTargets.push(vibeOtherWrap);
+  if (sourceSelect && sourceSelect.value === '__other_option__' && !data.source_other) invalidTargets.push(sourceOtherWrap);
+
+  if (invalidTargets.length > 0) {
+    invalidTargets.forEach(el => {
+      if (el && el.matches && (el.matches('input, textarea, select'))) {
+        markInvalid(el);
+      } else if (el && el.id === 'vibeOtherWrap' && vibeOtherInput) {
+        markInvalid(vibeOtherInput);
+      } else if (el && el.id === 'sourceOtherWrap' && sourceOtherInput) {
+        markInvalid(sourceOtherInput);
+      } else if (el && el.id === 'intentToggle') {
+        markIntentInvalid();
+      } else if (el && el.id === 'vibeGroup') {
+        showVibeHelper();
+      }
+    });
+    scrollToField(invalidTargets[0]);
+    return;
+  }
+
+  if (!terms) {
+    document.getElementById('terms').closest('.form-group').style.opacity = '0.6';
+    setTimeout(() => document.getElementById('terms').closest('.form-group').style.opacity = '1', 600);
+    return;
+  }
+
+  sendToGoogle(data);
+  showSuccessUI(this);
+});
+
+// ── Invite a friend ──
+const inviteBtn = document.getElementById('inviteBtn');
+const inviteNote = document.getElementById('inviteNote');
+
+function showInviteNote() {
+  if (!inviteNote) return;
+  inviteNote.textContent = "Copied. Send it to someone you'd actually want in the pool.";
+}
+
+if (inviteBtn) {
+  inviteBtn.addEventListener('click', () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({ url }).then(showInviteNote).catch(() => {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(showInviteNote);
+        }
+      });
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(showInviteNote);
+    }
+  });
+}
+// ── Theme toggle ──
+const themeBtn  = document.getElementById('themeBtn');
+const THEME_KEY = 'ss-theme';
+const osLight   = window.matchMedia('(prefers-color-scheme: light)');
+
+function applyTheme(isLight) {
+  document.body.classList.toggle('light', isLight);
+  // Keep html attr in sync (used by pre-paint script)
+  if (isLight) {
+    document.documentElement.setAttribute('data-theme', 'light');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
+}
+
+// On load: honour saved override, otherwise match OS
+(function() {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved) {
+    applyTheme(saved === 'light');
+  } else {
+    applyTheme(osLight.matches);
+  }
+})();
+
+// If user hasn't overridden, follow OS changes live
+osLight.addEventListener('change', e => {
+  if (!localStorage.getItem(THEME_KEY)) applyTheme(e.matches);
+});
+
+themeBtn.addEventListener('click', () => {
+  const isLight = !document.body.classList.contains('light');
+  applyTheme(isLight);
+  localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark');
+  themeBtn.style.transform = 'rotate(360deg)';
+  setTimeout(() => themeBtn.style.transform = '', 400);
+});
+</script>
+</body>
+</html>
